@@ -80,16 +80,16 @@ class ChatGPT
 
     private function getChatResponse(): array
     {
-            $response = $this->client->chat()->create([
-                'model' => config('openai.model_used'),
-                'temperature' => config('openai.temperature'),
-                'messages' => $this->messages->toArray(),
-            ]);
+        $response = $this->client->chat()->create([
+            'model' => config('openai.model_used'),
+            'temperature' => config('openai.temperature'),
+            'messages' => $this->messages->toArray(),
+        ]);
 
-            return [
-                'role' => $response->choices[0]->message->role,
-                'content' => $response->choices[0]->message->content,
-            ];
+        return [
+            'role' => $response->choices[0]->message->role,
+            'content' => $response->choices[0]->message->content,
+        ];
     }
 
     public function receive(): string
