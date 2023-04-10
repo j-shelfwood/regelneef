@@ -15,6 +15,21 @@ $app = new LaravelZero\Framework\Application(
     dirname(__DIR__)
 );
 
+$pharRunning = Phar::running(false);
+
+if (! empty($pharRunning)) {
+    if (file_exists($envPath)) {
+        // Load the .env file from the home directory.
+        $app->useEnvironmentPath(app_storage_path().DIRECTORY_SEPARATOR.'.env');
+    } else {
+        // Use the default .env selection logic.
+        $app->useEnvironmentPath($app->basePath());
+    }
+} else {
+    // Use the default .env selection logic.
+    $app->useEnvironmentPath($app->basePath());
+}
+
 /*
 |--------------------------------------------------------------------------
 | Bind Important Interfaces

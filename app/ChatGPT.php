@@ -13,19 +13,26 @@ class ChatGPT
 
     const ROLE_SYSTEM = 'system';
 
-    public function __construct(
-        protected Client $client,
-        protected Collection $messages = collect(),
-        protected int $maxTokens = config('openai.max_tokens'),
-        protected string $model = config('openai.model'),
-        protected float $temperature = config('openai.temperature')
-        ) {
+    public Collection $messages;
 
-    }
+    protected Client $client;
 
-    public function messages(): Collection
+    protected int $maxTokens;
+
+    protected string $model;
+
+    protected float $temperature;
+
+    public function __construct(Client $client, ?Collection $messages = null)
     {
-        return $this->messages;
+        if (is_null($messages)) {
+            $messages = collect();
+        }
+        $this->messages = $messages;
+        $this->client = $client;
+        $this->maxTokens = config('openai.max_tokens');
+        $this->model = config('openai.model');
+        $this->temperature = config('openai.temperature');
     }
 
     public function send(string $message): self
@@ -50,13 +57,6 @@ class ChatGPT
         return $this;
     }
 
-    public function reset(): self
-    {
-        $this->messages = collect();
-
-        return $this;
-    }
-
     private function validateMessageSize(string $message): void
     {
         if (OpenAITokenizer::count($message) > $this->maxTokens) {
@@ -77,6 +77,8 @@ class ChatGPT
         $totalTokens = OpenAITokenizer::count($this->messages->pluck('content')->implode(' '));
 
         while ($totalTokens > $this->maxTokens) {
+            $overflow = $totalTokens - $this->maxTokens;
+            echo PHP_EOL.'⚠️ Trimming message ('.$overflow.' tokens over context limit)'.PHP_EOL;
             $this->messages->shift();
 
             $totalTokens = OpenAITokenizer::count($this->messages);
@@ -101,9 +103,11 @@ class ChatGPT
 
     public function receive(): string
     {
-        // Replace the echo statement with a logger
-        // logger('✉️ Response: '.$this->messages->last()['content']);
-
         return $this->messages->last()['content'];
+    }
+
+    public function decode(): Collection
+    {
+        return collect(json_decode($this->messages->last()['content'], true));
     }
 }

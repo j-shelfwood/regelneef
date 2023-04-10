@@ -15,7 +15,7 @@ class ChatGPTServiceProvider extends ServiceProvider
 
     public function register(): void
     {
-        $this->app->singleton(ChatGPT::class, function () {
+        $this->app->bind(ChatGPT::class, function () {
             return new ChatGPT(OpenAI::client(config('openai.api_key')));
         });
     }
