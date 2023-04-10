@@ -1,5 +1,7 @@
 <?php
 
+use App\Providers\ChatGPTServiceProvider;
+
 return [
 
     /*
@@ -69,6 +71,7 @@ return [
     'providers' => [
         App\Providers\AppServiceProvider::class,
         Intonate\TinkerZero\TinkerZeroServiceProvider::class,
+        ChatGPTServiceProvider::class,
     ],
 
 ];

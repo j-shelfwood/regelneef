@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Helpers\OpenAITokenizer;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use OpenAI\Client;

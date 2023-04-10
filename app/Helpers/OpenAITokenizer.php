@@ -2,7 +2,7 @@
 
 //@ignore
 
-namespace App;
+namespace App\Helpers;
 
 class OpenAITokenizer
 {

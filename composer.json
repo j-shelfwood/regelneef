@@ -1,5 +1,5 @@
 {
-    "name": "Regelneef",
+    "name": "shelfwood/regelneef",
     "description": "My own AutoGPT client",
     "keywords": [
         "framework",
@@ -23,6 +23,7 @@
         "php": "^8.1",
         "illuminate/database": "^10.0",
         "intonate/tinker-zero": "^1.2",
+        "laminas/laminas-text": "^2.5",
         "laravel-zero/framework": "^10.0",
         "nunomaduro/termwind": "^1.15"
     },
