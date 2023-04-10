@@ -49,7 +49,7 @@ class MotherAgent extends Agent
         $subgoals = [];
 
         do {
-            $subgoal = $this->command->ask('What is a subgoal of your agent? (Enter "s" to stop adding subgoals)', 'Finding the next upcomming event, Searching for recipes related to that event for inspiration, Creating a new recipe for the event and saving it toa file');
+            $subgoal = $this->command->ask('What is a subgoal of your agent? (Enter "s" to stop adding subgoals)', 'Finding the next upcomming event, Searching for recipes related to that event for inspiration, Creating a new recipe for the event and saving it to recipe.md file');
             if ($subgoal != 's') {
                 $subgoals[] = $subgoal;
             }

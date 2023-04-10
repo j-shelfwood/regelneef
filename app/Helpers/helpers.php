@@ -15,7 +15,7 @@ function get_prompt(string $name): string
         collect(config('actions.actions'))
             ->map(function ($action, $name) {
                 // Format: - `@name`: @description (@arguments+description)
-                return "- `@$name`: {$action['description']} (".collect($action['arguments'])->map(function ($argument, $name) {
+                return "- `$name`: {$action['description']} (".collect($action['arguments'])->map(function ($argument, $name) {
                     return "`$name`: {$argument['description']}";
                 })->implode(', ').')';
             })

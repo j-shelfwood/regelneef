@@ -4,6 +4,7 @@ namespace App\Agents;
 
 use App\Actions\Action;
 use App\ChatGPT;
+use App\Helpers\OpenAITokenizer;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
 
@@ -38,6 +39,10 @@ abstract class Agent
     protected function start(): void
     {
         $this->command->info('🛫 Starting up agent...');
+        // Get the token counts for $this->chat->messages (content key on each message) and add $this->prompt to it, then output the total token count
+        $tokenCount = $this->chat->messages->pluck('content')->map(fn ($message) => OpenAITokenizer::count($message))->sum() + OpenAITokenizer::count($this->prompt);
+        $this->command->info("📝 Token count: {$tokenCount}");
+
         // Send the user message to the AI
         $this->chat->send($this->prompt);
         while (true) {
@@ -59,7 +64,7 @@ abstract class Agent
                 if (! $confirmed) {
                     // If not confirmed, send a message to the AI to rethink
                     $message = $this->command->ask('🫵 Provide the agent some guidance on what to do next');
-                    $this->chat->send('Please rethink the action and provide an alternative.');
+                    $this->chat->send('Action not confirmed. '.$message);
 
                     continue;
                 }
@@ -82,7 +87,8 @@ abstract class Agent
     {
         // Check if it has the required keys; if not dd() the response
         if (! $response->has(['thoughts', 'command'])) {
-            dd($response);
+
+            dd($response, $this->messages);
         }
         $this->command->info('💻 [AI]');
 
@@ -92,7 +98,7 @@ abstract class Agent
         $this->command->info("👎 Criticism:\n\n{$response['thoughts']['criticism']}\n");
         $this->command->info("🗣 Speak:\n\n{$response['thoughts']['speak']}\n");
 
-        $this->command->info('💬 Requested Command :'.$response['command']['name']);
+        $this->command->info('💬 Requested Command : '.$response['command']['name']);
         $this->command->line('');
         $this->command->table(
             ['Name', 'Value'],

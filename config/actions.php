@@ -14,7 +14,6 @@ return [
                 ],
             ],
         ],
-
         'browse_web' => [
             'description' => 'Browse the web to find information',
             'class' => App\Actions\BrowseWebAction::class,
@@ -28,7 +27,7 @@ return [
             ],
         ],
         'google' => [
-            'description' => 'Search Google for information',
+            'description' => 'Search Google for websites to browse',
             'class' => App\Actions\GoogleAction::class,
             'arguments' => [
                 'query' => [

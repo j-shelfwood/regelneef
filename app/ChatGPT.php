@@ -108,6 +108,18 @@ class ChatGPT
 
     public function decode(): Collection
     {
-        return collect(json_decode($this->messages->last()['content'], true));
+        $content = $this->messages->last()['content'];
+
+        // If the string does not start with a {, it's not JSON, try to slice it off
+        if (! str_starts_with($this->messages->last()['content'], '{')) {
+            $content = substr($this->messages->last()['content'], strpos($this->messages->last()['content'], '{'));
+        }
+
+        if (! json_decode($this->messages->last()['content'], true)) {
+            echo PHP_EOL.'⚠️ Could not decode message: ';
+            dd($content);
+        }
+
+        return collect(json_decode($content, true));
     }
 }
