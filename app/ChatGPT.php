@@ -78,8 +78,8 @@ class ChatGPT
 
         while ($totalTokens > $this->maxTokens) {
             $overflow = $totalTokens - $this->maxTokens;
-            echo PHP_EOL.'⚠️ Trimming message ('.$overflow.' tokens over context limit)'.PHP_EOL;
-            $this->messages->shift();
+            echo PHP_EOL . '⚠️ Trimming message (' . $overflow . ' tokens over context limit)' . PHP_EOL;
+            $this->messages = $this->messages->slice(1)->values();
 
             $totalTokens = OpenAITokenizer::count($this->messages);
         }
@@ -91,7 +91,7 @@ class ChatGPT
             $response = $this->client->chat()->create([
                 'model' => $this->model,
                 'temperature' => $this->temperature,
-                'messages' => $this->messages->toArray(),
+                'messages' => (array) $this->messages->toArray(),
             ]);
 
             return [
@@ -111,13 +111,13 @@ class ChatGPT
         $content = $this->messages->last()['content'];
 
         // If the string does not start with a {, it's not JSON, try to slice it off
-        if (! str_starts_with($this->messages->last()['content'], '{')) {
+        if (!str_starts_with($this->messages->last()['content'], '{')) {
             $content = substr($this->messages->last()['content'], strpos($this->messages->last()['content'], '{'));
         }
 
-        if (! json_decode($this->messages->last()['content'], true)) {
-            echo PHP_EOL.'⚠️ Could not decode message: ';
-            dd($content);
+        if (!json_decode($this->messages->last()['content'], true)) {
+            echo PHP_EOL . '⚠️ Could not decode message: ';
+            echo $content;
         }
 
         return collect(json_decode($content, true));

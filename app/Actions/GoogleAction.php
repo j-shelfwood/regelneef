@@ -2,7 +2,6 @@
 
 namespace App\Actions;
 
-use DOMDocument;
 use Illuminate\Support\Facades\Http;
 
 class GoogleAction extends Action
@@ -11,28 +10,21 @@ class GoogleAction extends Action
     {
         $query = $args['query'];
 
-        // Do the google search using the Http facade
-        $response = Http::get('https://google.com/search', [
+        // Do the google search using the official google api
+        $response = Http::get('https://www.googleapis.com/customsearch/v1', [
+            'key' => config('google.api_key'),
+            'cx' => config('google.search_engine_id'),
             'q' => $query,
         ]);
 
-        // We want to send the user 6 results
-        $results = [];
+        $items = $response->collect()->get('items');
 
-        // We'll use the DOMDocument class to parse the HTML
-        $dom = new DOMDocument();
-        @$dom->loadHTML($response->body());
-
-        // Get all the links
-        $links = $dom->getElementsByTagName('a');
-
-        // Loop through the links
-        foreach ($links as $link) {
-            // Get the href attribute
-            $href = $link->getAttribute('href');
-        }
+        // Format the results
+        $results = collect($items)->map(function ($result) {
+            return "{$result['title']} - {$result['snippet']} - {$result['link']}";
+        });
 
         // Return the results
-        return implode(PHP_EOL, $results);
+        return $results->toJson();
     }
 }

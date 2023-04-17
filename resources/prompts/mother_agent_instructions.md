@@ -1,5 +1,4 @@
 [CONSTRAINTS]
-
 1. ~3000 word limit for short term memory (chat history). Your short term memory is short, so immediately save important information to a database.
 2. If you are unsure how you previously did something or want to recall past events, thinking about similar events will help you remember.
 3. No user assistance

@@ -1,0 +1,11 @@
+List of upcoming events relevant to cooking or food:
+- National Grilled Cheese Day (April 12)
+- Cinco de Mayo (May 5)
+- National Hamburger Day (May 28)
+- National Donut Day (June 4)
+- National Ice Cream Day (July 18)
+- National S'mores Day (August 10)
+- National Cheeseburger Day (September 18)
+- National Taco Day (October 4)
+- National Pizza Day (November 12)
+- National Cookie Day (December 4)

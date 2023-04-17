@@ -58,13 +58,13 @@ abstract class Agent
             }
 
             // Handle user confirmation if $isContinuous is false
-            if (! $this->isContinuous) {
+            if (!$this->isContinuous) {
                 $confirmed = $this->command->confirm('✨ Do you confirm the requested action?');
 
-                if (! $confirmed) {
+                if (!$confirmed) {
                     // If not confirmed, send a message to the AI to rethink
                     $message = $this->command->ask('🫵 Provide the agent some guidance on what to do next');
-                    $this->chat->send('Action not confirmed. '.$message);
+                    $this->chat->send('Action not confirmed. ' . $message);
 
                     continue;
                 }
@@ -73,11 +73,17 @@ abstract class Agent
             // Execute the requested action
             $actionName = $response['command']['name'];
             $actionArgs = $response['command']['args'];
-            $action = Action::getActionByName($actionName);
-            $actionResult = $action->execute($actionArgs);
 
-            // Send the action result to the AI
-            $this->chat->send("The action '{$actionName}' was executed. Result: {$actionResult}");
+            try {
+                $action = Action::getActionByName($actionName, $this->command);
+                $actionResult = $action->execute($actionArgs);
+
+                // Send the action result to the AI
+                $this->chat->send("The action '{$actionName}' was executed. Result: {$actionResult}");
+            } catch (\Exception $e) {
+                // If the action fails, send the error message to the AI
+                $this->chat->send("The action '{$actionName}' failed. Error: {$e->getMessage()}");
+            }
         }
 
         $this->completed = $response['command']['args']['is_success'];
@@ -86,9 +92,8 @@ abstract class Agent
     protected function displayResponse(Collection $response): void
     {
         // Check if it has the required keys; if not dd() the response
-        if (! $response->has(['thoughts', 'command'])) {
-
-            dd($response, $this->messages);
+        if (!$response->has(['thoughts', 'command'])) {
+            dd($response, $this->chat->messages);
         }
         $this->command->info('💻 [AI]');
 
@@ -98,14 +103,17 @@ abstract class Agent
         $this->command->info("👎 Criticism:\n\n{$response['thoughts']['criticism']}\n");
         $this->command->info("🗣 Speak:\n\n{$response['thoughts']['speak']}\n");
 
-        $this->command->info('💬 Requested Command : '.$response['command']['name']);
+        $this->command->info('💬 Requested Command : ' . $response['command']['name']);
         $this->command->line('');
-        $this->command->table(
-            ['Name', 'Value'],
-            collect($response['command']['args'])->map(function ($value, $key) {
-                return [$key, json_encode($value, JSON_PRETTY_PRINT)];
-            })->toArray()
-        );
+        // Show the ['command']['args'] if it's not empty
+        if (!empty($response['command']['args'])) {
+            $this->command->info('📝 Command Arguments:');
+            $this->command->line('');
+            foreach ($response['command']['args'] as $key => $value) {
+                $this->command->info("{$key}: {$value}");
+            }
+            $this->command->line('');
+        }
     }
 
     public function isSuccess(): bool
